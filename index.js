@@ -32,19 +32,19 @@ async function run() {
 
     const ToyCollection = client.db('joywithToy').collection('Toys');
 
+    const BuyToysCollection = client.db('joywithToy').collection('buyToys');
+
+    // const indexKeys = { toyName: 1 };
+    // const indexOptions = { name: 'toyName' };
+    // const result = await ToyCollection.createIndex(indexKeys,indexOptions);
 
     app.post('/toysInfo', async(req,res) => {
       const ToysInfo = req.body;
       console.log(ToysInfo);
+      // ToysInfo.createdAt = new Data();
       const result = await ToyCollection.insertOne(ToysInfo);
       res.send(result);
     })
-
-
-    // app.get('/toysInfos', async(req,res) => {
-    //   const result = await ToyCollection.find().toArray();
-    //   res.send(result);
-    // })
 
 
     app.get('/toysInfos', async(req,res) => {
@@ -62,6 +62,20 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await ToyCollection.find(query).toArray();
+      res.send(result);
+    })
+
+
+    // for tab
+
+    app.get('/toysDataInfos/:text', async(req,res) => {
+      // console.log(req.params.text);
+      if(req.params.text == 'RegularCar' || req.params.text == 'Truck' || req.params.text == 'MiniPoliceCar'){
+        const result = await ToyCollection.find({subCategory: req.params.text}).sort({createdAt: -1}).toArray();
+        return res.send(result);
+      }
+
+      const result = await ToyCollection.find().sort({createdAt: -1}).toArray();
       res.send(result);
     })
 
@@ -95,6 +109,51 @@ async function run() {
 
 
 
+    // for data search
+
+    //     const indexKeys = { toyName: 1 };
+    // const indexOptions = { name: 'toyName' };
+    // const result = await ToyCollection.createIndex(indexKeys,indexOptions);
+
+    app.get('/ToySerchByName/:text', async(req,res) =>{
+      const searchText = req.params.text;
+
+      const result = await ToyCollection.find({
+        $or:[
+          {toyName: {$regex: searchText, $options: 'i'}}
+        ],
+      }).toArray();
+
+      res.send(result);
+    })
+
+
+
+
+
+    // For Buy Inforation
+
+    app.post('/BuyToysInfo', async(req,res) => {
+      const ViewDetailsData = req.body;
+      console.log(ViewDetailsData);
+      const result = await BuyToysCollection.insertOne(ViewDetailsData);
+      res.send(result);
+    })
+
+    app.get('/BuyToysInfo', async(req,res) => {
+      const result = await BuyToysCollection.find().toArray();
+      res.send(result);
+    })
+
+    // app.get('/BuyToysInfo/:id', async(req,res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: (id) }
+    //   const result = await BuyToysCollection.find(query).toArray();
+    //   res.send(result);
+    // })
+
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -114,5 +173,5 @@ app.get('/', (req, res) => {
 })
 
 app.listen(port, () => {
-	console.log(`Car Doctor Server is Running on Port ${port}`);
+	console.log(`Joy with Toy Server is Running on Port ${port}`);
 })
