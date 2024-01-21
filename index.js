@@ -111,7 +111,7 @@ async function run() {
 
     // for data search
 
-    //     const indexKeys = { toyName: 1 };
+    // const indexKeys = { toyName: 1 };
     // const indexOptions = { name: 'toyName' };
     // const result = await ToyCollection.createIndex(indexKeys,indexOptions);
 
@@ -145,12 +145,19 @@ async function run() {
       res.send(result);
     })
 
-    // app.get('/BuyToysInfo/:id', async(req,res) => {
-    //   const id = req.params.id;
-    //   const query = { _id: (id) }
-    //   const result = await BuyToysCollection.find(query).toArray();
-    //   res.send(result);
-    // })
+    app.get('/BuyToysInfo/:id', async(req,res) => {
+      const id = req.params.id;
+      const query = { _id: (id) }
+      const result = await BuyToysCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    app.delete('/BuyToysInfo/:id', async(req,res) => {
+      const id = req.params.id;
+      const query = { _id: (id) }
+      const result = await BuyToysCollection.deleteOne(query)
+      res.send(result);
+    })
 
 
 
